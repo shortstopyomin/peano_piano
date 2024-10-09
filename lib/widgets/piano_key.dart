@@ -16,18 +16,25 @@ class PianoKey extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isAccidental = note.length == 2;
-    return Material(
-      color: pressed
-          ? Coloors.activeKeyColor
-          : isAccidental
-              ? Coloors.accidentalKeyColor
-              : Coloors.keyColor,
+    return Card(
+      margin: EdgeInsets.zero,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+            topLeft: note == 'c'? const Radius.circular(16): const Radius.circular(0),
+            topRight: note == 'b'? const Radius.circular(16): const Radius.circular(0),
+            bottomLeft: const Radius.circular(16),
+            bottomRight: const Radius.circular(16)),
+      ),
+      color: Coloors.keyColor,
       child: InkWell(
         highlightColor: Coloors.activeKeyColor,
+        splashColor: Coloors.activeKeyColor,
+        borderRadius: BorderRadius.circular(16.0),
         onTapDown: (_) => AudioPlayerService.instance.play(note),
         child: Container(
-          height: isAccidental ? keyHeight * 0.6 : keyHeight,
-          width: isAccidental ? keyWidth / 2 : keyWidth,
+          height: keyHeight,
+          width: keyWidth,
           decoration: BoxDecoration(
             color: Colors.transparent,
             border: Border.all(color: Coloors.borderColor, width: 2),
@@ -77,7 +84,6 @@ class BlackPianoKey extends StatelessWidget {
       child: InkWell(
         highlightColor: Coloors.activeKeyColor,
         onTapDown: (_) {
-          print('yoyo note: $note');
           AudioPlayerService.instance.play(note);
         },
         child: const Image(
