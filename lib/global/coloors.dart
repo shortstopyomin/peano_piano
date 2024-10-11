@@ -8,4 +8,5 @@ class Coloors {
   static const borderColor = Colors.black;
   static const activeKeyColor = Color(0xFFB6C79F);
   static const backgroundColor = Color(0xFF8F917A);
+  static const blackKeyActiveColor = Color(0xFF5F843E);
 }

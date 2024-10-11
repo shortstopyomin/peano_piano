@@ -82,7 +82,9 @@ class BlackPianoKey extends StatelessWidget {
           : Colors.transparent,
           // : Coloors.accidentalKeyColor,
       child: InkWell(
-        highlightColor: Coloors.activeKeyColor,
+        highlightColor: Coloors.blackKeyActiveColor,
+        splashColor: Coloors.blackKeyActiveColor,
+        borderRadius: BorderRadius.circular(24.0),
         onTapDown: (_) {
           AudioPlayerService.instance.play(note);
         },
