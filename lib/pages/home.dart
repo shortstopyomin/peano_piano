@@ -2,14 +2,28 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
+import 'package:go_router/go_router.dart';
+import 'package:metronome/metronome.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:peano_piano/global/coloors.dart';
 import 'package:peano_piano/global/constants.dart';
+import 'package:peano_piano/router/route_constants.dart';
 import 'package:peano_piano/services/autio_player.dart';
 import 'package:peano_piano/widgets/piano.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+enum MetronomeState {
+  /// Metronome is stopped
+  isStopped,
+
+  /// Metronome is playing
+  isPlaying,
+}
 
 typedef _Fn = void Function();
 const theSource = AudioSource.microphone;
@@ -24,13 +38,22 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<String> pressedKeys = [];
 
-  Codec _codec = Codec.aacMP4;
-  String _mPath = 'tau_file.mp4';
+  final Codec _codec = Codec.aacMP4;
   FlutterSoundPlayer? _mPlayer = FlutterSoundPlayer();
   FlutterSoundRecorder? _mRecorder = FlutterSoundRecorder();
   bool _mPlayerIsInited = false;
   bool _mRecorderIsInited = false;
   bool _mplaybackReady = false;
+  File? _recordedFile;
+  String? _filePath;
+  MetronomeState _metronomeState = MetronomeState.isStopped;
+  final _metronomePlugin = Metronome();
+  bool isMetronomePlaying = false;
+  int bpm = 120;
+  int vol = 50;
+  String metronomeIcon = 'assets/metronome-left.png';
+  String metronomeIconRight = 'assets/metronome-right.png';
+  String metronomeIconLeft = 'assets/metronome-left.png';
 
   @override
   void initState() {
@@ -46,6 +69,25 @@ class _HomeState extends State<Home> {
       });
     });
     super.initState();
+    _metronomePlugin.init(
+      'assets/audio/woodblock_high44_wav.wav',
+      bpm: bpm,
+      volume: vol,
+      enableSession: true,
+      enableTickCallback: true,
+    );
+    _metronomePlugin.onListenTick((_) {
+      if (kDebugMode) {
+        print('tick');
+      }
+      setState(() {
+        if (metronomeIcon == metronomeIconRight) {
+          metronomeIcon = metronomeIconLeft;
+        } else {
+          metronomeIcon = metronomeIconRight;
+        }
+      });
+    });
   }
 
   @override
@@ -55,6 +97,7 @@ class _HomeState extends State<Home> {
 
     _mRecorder!.closeRecorder();
     _mRecorder = null;
+    _metronomePlugin.destroy();
     super.dispose();
   }
 
@@ -91,33 +134,36 @@ class _HomeState extends State<Home> {
             ),
             Positioned(
               left: 104,
-              top: 14,
+              top: 10,
               child: Row(
                 children: [
                   ElevatedButton(
-                    onPressed: () {},
-                    child: Icon(
-                      size: 30,
-                        Icons.mic, color: Colors.white), // icon of the button
+                    onPressed: getRecorderFn(), // icon of the button
                     style: ElevatedButton.styleFrom( // styling the button
-                      shape: CircleBorder(),
-                      padding: EdgeInsets.all(6),
-                      backgroundColor: Colors.red, // Button color
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(2),
+                      backgroundColor: _mRecorder!.isRecording ? Colors.red : Colors.grey, // Button color
                       foregroundColor: Colors.cyan, // Splash color
                     ),
+                    child: Icon(
+                      size: 30,
+                      _mRecorder!.isRecording ? Icons.stop_rounded : Icons.mic,
+                        color: Colors.white,
+                    ),
                   ),
-                  ElevatedButton(
-                    onPressed: getRecorderFn(),
-                    //color: Colors.white,
-                    //disabledColor: Colors.grey,
-                    child: Text(_mRecorder!.isRecording ? 'Stop' : 'Record'),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  Text(_mRecorder!.isRecording
-                      ? 'YOYO Recording in progress'
-                      : 'Recorder is stopped'),
+                  // ElevatedButton(
+                  //   onPressed: () {},
+                  //   // onPressed: getRecorderFn(),
+                  //   //color: Colors.white,
+                  //   //disabledColor: Colors.grey,
+                  //   child: Text(_mRecorder!.isRecording ? 'Stop' : 'Record'),
+                  // ),
+                  // const SizedBox(
+                  //   width: 20,
+                  // ),
+                  // Text(_mRecorder!.isRecording
+                  //     ? 'Recording in progress'
+                  //     : 'Recorder is stopped'),
                   const SizedBox(
                     width: 20,
                   ),
@@ -130,11 +176,64 @@ class _HomeState extends State<Home> {
                   const SizedBox(
                     width: 20,
                   ),
-                  Text(_mPlayer!.isPlaying
-                      ? 'Playback in progress'
-                      : 'Player is stopped'),
+                  ElevatedButton(
+                    onPressed: () async {
+                      // final result = await context.pushNamed(RouteName.metronomeSettings);
+                      if (isMetronomePlaying) {
+                        _metronomePlugin.pause();
+                        isMetronomePlaying = false;
+                      } else {
+                        _metronomePlugin.setVolume(vol);
+                        _metronomePlugin.play(bpm);
+                        isMetronomePlaying = true;
+                      }
+                      setState(() {});
+                    }, // icon of the button
+                    style: ElevatedButton.styleFrom( // styling the button
+                      shape: const CircleBorder(),
+                      padding: const EdgeInsets.all(4),
+                      backgroundColor: isMetronomePlaying ? Colors.red : Colors.transparent, // Button colorSplash color
+                    ),
+                    child: SizedBox(
+                        width: 26,
+                        height: 26,
+                        child: Image.asset('assets/metronome.png'),
+                    )
+                  ),
+                  if (isMetronomePlaying)...[
+                    Text(
+                      'BPM:$bpm',
+                      style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 18
+                      ),
+                    ),
+                    Slider(
+                      value: bpm.toDouble(),
+                      min: 30,
+                      max: 300,
+                      divisions: 270,
+                      onChangeEnd: (val) {
+                        _metronomePlugin.setBPM(bpm);
+                      },
+                      onChanged: (val) {
+                        bpm = val.toInt();
+                        setState(() {});
+                      },
+                    ),
+                  ]
                 ],
               ),
+            ),
+            Positioned(
+              right: 44,
+              top: 18,
+              child: isMetronomePlaying ? Image.asset(
+                metronomeIcon,
+                height: 48,
+                gaplessPlayback: true,
+                color: Colors.white70,
+              ): const SizedBox.shrink(),
             ),
             Center(child: Piano(pressedKeys: pressedKeys)),
           ],
@@ -144,6 +243,14 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> openTheRecorder() async {
+    var status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      throw RecordingPermissionException('Microphone permission not granted');
+    }
+    var storageStatus = await Permission.storage.request();
+    if (storageStatus != PermissionStatus.granted) {
+      throw RecordingPermissionException('Storage permission not granted');
+    }
     await _mRecorder!.openRecorder();
 
     final session = await AudioSession.instance;
@@ -170,10 +277,18 @@ class _HomeState extends State<Home> {
 
   // ----------------------  Here is the code for recording and playback -------
 
-  void record() {
+  Future<void> record() async {
+    // Directory appDocDir = await getApplicationDocumentsDirectory();
+    // final filePath =
+    // '${appDocDir.path}/${DateTime.now().millisecondsSinceEpoch}/recording.m4a';
+    final directory = await getApplicationDocumentsDirectory();
+    print('yoyo directory= $directory');
+    print('yoyo directory= ${directory!.path}');
+    print('yoyo directory= ${directory.absolute}');
+    _recordedFile = File('${directory.path}/${DateTime.now().millisecondsSinceEpoch}.m4a');
     _mRecorder!
         .startRecorder(
-      toFile: _mPath,
+      toFile: _recordedFile!.path,
       codec: _codec,
       audioSource: theSource,
     )
@@ -189,6 +304,9 @@ class _HomeState extends State<Home> {
         _mplaybackReady = true;
       });
     });
+    print('_recordedFile = $_recordedFile');
+    print('_recordedFile.path = ${_recordedFile!.path}');
+    print('_recordedFile.absolute = ${_recordedFile!.absolute}');
   }
 
   _Fn? getRecorderFn() {
@@ -212,7 +330,7 @@ class _HomeState extends State<Home> {
         _mPlayer!.isStopped);
     _mPlayer!
         .startPlayer(
-        fromURI: _mPath,
+        fromURI: _recordedFile!.path,
         //codec: kIsWeb ? Codec.opusWebM : Codec.aacADTS,
         whenFinished: () {
           setState(() {});
