@@ -152,30 +152,14 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                   // ElevatedButton(
-                  //   onPressed: () {},
-                  //   // onPressed: getRecorderFn(),
+                  //   onPressed: getPlaybackFn(),
                   //   //color: Colors.white,
                   //   //disabledColor: Colors.grey,
-                  //   child: Text(_mRecorder!.isRecording ? 'Stop' : 'Record'),
+                  //   child: Text(_mPlayer!.isPlaying ? 'Stop' : 'Play'),
                   // ),
                   // const SizedBox(
                   //   width: 20,
                   // ),
-                  // Text(_mRecorder!.isRecording
-                  //     ? 'Recording in progress'
-                  //     : 'Recorder is stopped'),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  ElevatedButton(
-                    onPressed: getPlaybackFn(),
-                    //color: Colors.white,
-                    //disabledColor: Colors.grey,
-                    child: Text(_mPlayer!.isPlaying ? 'Stop' : 'Play'),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
                   ElevatedButton(
                     onPressed: () async {
                       // final result = await context.pushNamed(RouteName.metronomeSettings);
@@ -213,6 +197,7 @@ class _HomeState extends State<Home> {
                       min: 30,
                       max: 300,
                       divisions: 270,
+                      activeColor: Colors.lightGreen,
                       onChangeEnd: (val) {
                         _metronomePlugin.setBPM(bpm);
                       },
