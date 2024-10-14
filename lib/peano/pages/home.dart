@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
 import 'package:metronome/metronome.dart';
+import 'package:oktoast/oktoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:peano_piano/peano/global/coloors.dart';
 import 'package:peano_piano/peano/global/constants.dart';
@@ -271,9 +272,6 @@ class _HomeState extends State<Home> {
     // final filePath =
     // '${appDocDir.path}/${DateTime.now().millisecondsSinceEpoch}/recording.m4a';
     final directory = await getApplicationDocumentsDirectory();
-    print('yoyo directory= $directory');
-    print('yoyo directory= ${directory!.path}');
-    print('yoyo directory= ${directory.absolute}');
     _recordedFile = File('${directory.path}/${DateTime.now().millisecondsSinceEpoch}.m4a');
     _mRecorder!
         .startRecorder(
@@ -288,14 +286,12 @@ class _HomeState extends State<Home> {
 
   void stopRecorder() async {
     await _mRecorder!.stopRecorder().then((value) {
+      showToast("Saved");
       setState(() {
         //var url = value;
         _mplaybackReady = true;
       });
     });
-    print('_recordedFile = $_recordedFile');
-    print('_recordedFile.path = ${_recordedFile!.path}');
-    print('_recordedFile.absolute = ${_recordedFile!.absolute}');
   }
 
   _Fn? getRecorderFn() {

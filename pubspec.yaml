@@ -41,6 +41,7 @@ dependencies:
   go_router: ^14.3.0
   just_audio: ^0.9.41
   metronome: ^1.1.5
+  oktoast: ^3.4.0
   path_provider: ^2.1.4
   permission_handler: ^11.3.1
   path: ^1.9.0
