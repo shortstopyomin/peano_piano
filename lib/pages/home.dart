@@ -129,12 +129,12 @@ class _HomeState extends State<Home> {
                 image: const AssetImage('assets/keyboard_border.png'),
                 width: MediaQuery.sizeOf(context).width,
                 height: MediaQuery.sizeOf(context).height - 24,
-                fit: BoxFit.fill,
+                fit: BoxFit.contain,
               ),
             ),
             Positioned(
               left: 104,
-              top: 10,
+              top: isTablet ? 60 : 13,
               child: Row(
                 children: [
                   ElevatedButton(
@@ -146,7 +146,7 @@ class _HomeState extends State<Home> {
                       foregroundColor: Colors.cyan, // Splash color
                     ),
                     child: Icon(
-                      size: 30,
+                      size: isTablet ? 60 : 30,
                       _mRecorder!.isRecording ? Icons.stop_rounded : Icons.mic,
                         color: Colors.white,
                     ),
@@ -157,9 +157,9 @@ class _HomeState extends State<Home> {
                   //   //disabledColor: Colors.grey,
                   //   child: Text(_mPlayer!.isPlaying ? 'Stop' : 'Play'),
                   // ),
-                  // const SizedBox(
-                  //   width: 20,
-                  // ),
+                  const SizedBox(
+                    width: 20,
+                  ),
                   ElevatedButton(
                     onPressed: () async {
                       // final result = await context.pushNamed(RouteName.metronomeSettings);
@@ -175,22 +175,28 @@ class _HomeState extends State<Home> {
                     }, // icon of the button
                     style: ElevatedButton.styleFrom( // styling the button
                       shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(3),
                       backgroundColor: isMetronomePlaying ? Colors.red : Colors.transparent, // Button colorSplash color
                     ),
                     child: SizedBox(
-                        width: 26,
-                        height: 26,
+                        width: isTablet ? 64 : 28,
+                        height: isTablet ? 64 : 28,
                         child: Image.asset('assets/metronome.png'),
                     )
                   ),
                   if (isMetronomePlaying)...[
+                    const SizedBox(
+                      width: 20,
+                    ),
                     Text(
                       'BPM:$bpm',
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: Colors.white70,
-                          fontSize: 18
+                          fontSize: isTablet ? 32 : 18
                       ),
+                    ),
+                    const SizedBox(
+                      width: 16,
                     ),
                     Slider(
                       value: bpm.toDouble(),
@@ -211,11 +217,11 @@ class _HomeState extends State<Home> {
               ),
             ),
             Positioned(
-              right: 44,
-              top: 18,
+              right: isTablet ? 60 : 44,
+              top: isTablet ? 60 : 18,
               child: isMetronomePlaying ? Image.asset(
                 metronomeIcon,
-                height: 48,
+                height: isTablet ? 72 : 48,
                 gaplessPlayback: true,
                 color: Colors.white70,
               ): const SizedBox.shrink(),
@@ -330,4 +336,11 @@ class _HomeState extends State<Home> {
       setState(() {});
     });
   }
+}
+
+bool get isTablet {
+  final firstView = WidgetsBinding.instance.platformDispatcher.views.first;
+  final logicalShortestSide =
+      firstView.physicalSize.shortestSide / firstView.devicePixelRatio;
+  return logicalShortestSide > 600;
 }
