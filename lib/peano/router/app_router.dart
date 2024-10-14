@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:peano_piano/pages/home.dart';
-import 'package:peano_piano/pages/metronome_settings.dart';
-import 'package:peano_piano/router/route_constants.dart';
+import 'package:peano_piano/peano/pages/home.dart';
+import 'package:peano_piano/peano/pages/metronome_settings.dart';
+import 'package:peano_piano/peano/router/route_constants.dart';
 
 // Create keys for `root` & `space` navigator avoiding unnecessary rebuilds
 final _rootNavigatorKey = GlobalKey<NavigatorState>();

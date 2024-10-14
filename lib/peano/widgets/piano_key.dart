@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:peano_piano/global/coloors.dart';
-import 'package:peano_piano/global/constants.dart';
-import 'package:peano_piano/services/autio_player.dart';
+import 'package:peano_piano/peano/global/coloors.dart';
+import 'package:peano_piano/peano/global/constants.dart';
+import 'package:peano_piano/peano/services/autio_player.dart';
 
 class PianoKey extends StatelessWidget {
   const PianoKey({

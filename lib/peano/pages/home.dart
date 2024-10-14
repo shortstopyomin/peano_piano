@@ -7,14 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
-import 'package:go_router/go_router.dart';
 import 'package:metronome/metronome.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:peano_piano/global/coloors.dart';
-import 'package:peano_piano/global/constants.dart';
-import 'package:peano_piano/router/route_constants.dart';
-import 'package:peano_piano/services/autio_player.dart';
-import 'package:peano_piano/widgets/piano.dart';
+import 'package:peano_piano/peano/global/coloors.dart';
+import 'package:peano_piano/peano/global/constants.dart';
+import 'package:peano_piano/peano/services/autio_player.dart';
+import 'package:peano_piano/peano/widgets/piano.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 enum MetronomeState {
@@ -134,7 +132,7 @@ class _HomeState extends State<Home> {
             ),
             Positioned(
               left: 104,
-              top: isTablet ? 60 : 13,
+              top: isTablet ? 60 : 14,
               child: Row(
                 children: [
                   ElevatedButton(
@@ -146,7 +144,7 @@ class _HomeState extends State<Home> {
                       foregroundColor: Colors.cyan, // Splash color
                     ),
                     child: Icon(
-                      size: isTablet ? 60 : 30,
+                      size: isTablet ? 60 : 28,
                       _mRecorder!.isRecording ? Icons.stop_rounded : Icons.mic,
                         color: Colors.white,
                     ),

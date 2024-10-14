@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:peano_piano/global/constants.dart';
-import 'package:peano_piano/widgets/piano_key.dart';
+import 'package:peano_piano/peano/global/constants.dart';
+import 'package:peano_piano/peano/widgets/piano_key.dart';
 
 class Piano extends StatelessWidget {
   const Piano({super.key, required this.pressedKeys});

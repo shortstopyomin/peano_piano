@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:peano_piano/pages/home.dart';
-import 'package:peano_piano/router/app_router.dart';
+import 'package:peano_piano/peano/router/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
